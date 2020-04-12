@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Category;
+use App\Http\Requests\Categories\CreateCategoryRequest;
+use App\Http\Requests\Categories\UpdateCategoryRequest;
 
 class CategoriesController extends Controller
 {
@@ -33,18 +35,15 @@ class CategoriesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateCategoryRequest  $request)
     {
-        $request->validate([
-            'name' => 'required|unique:categories'
-        ]);
-
         Category::create([
             'name' => $request->name
         ]);
 
+        session()->flash('success','Category Created Successfully.');
+
         return redirect(route('categories.index'));
-        // $this->validate($request,);
     }
 
     /**
@@ -64,9 +63,9 @@ class CategoriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Category $category)
     {
-        //
+        return view('categories.create',['category' => $category]); 
     }
 
     /**
@@ -76,9 +75,15 @@ class CategoriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateCategoryRequest $request, Category $category)
     {
-        //
+        $category->update([
+            'name' => $request->name
+        ]);
+
+        session()->flash('success','Category Updated Successfully.');
+
+        return redirect(route('categories.index'));
     }
 
     /**
@@ -87,8 +92,11 @@ class CategoriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        session()->flash('success','Category Deleted Successfully.');
+
+        return redirect(route('categories.index'));
     }
 }
